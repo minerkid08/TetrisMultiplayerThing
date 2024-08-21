@@ -1,8 +1,9 @@
 #pragma once
+#include <string>
 
 class Game
 {
 public:
-  char board[200];
+  std::string board;
   int id;
 };
