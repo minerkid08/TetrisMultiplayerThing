@@ -8,7 +8,7 @@
 
 int gameIndex = 0;
 
-std::vector<Game> games = {{}, {}};
+std::vector<Game> games;
 
 std::string responce;
 
@@ -24,20 +24,23 @@ void handleRequest(Request request)
 	{
 		responce = std::to_string(gameIndex++);
 		games.push_back({});
-		std::cout << responce << '\n';
 	}
 	else if (path[1] == 'g')
 	{
-		if (responce.size() < 201)
-		{
-			responce.resize(201);
-		}
 		int gameInd = request.arg[0] - '0';
 		int p = request.arg.find('%') + 1;
-		std::string data = request.arg.substr(p, request.arg.size() - p);
-		memcpy(&(games[gameInd].board), data.c_str(), 200);
-		memcpy((char*)responce.c_str(), &(games[gameInd].board), 200);
-		std::cout << responce << '\n';
+		games[gameInd].board = request.arg.substr(p, request.arg.size() - p);
+		responce = "0";
+		int gameCount = 0;
+		for (int i = 0; i < games.size(); i++)
+		{
+			if (i != gameInd)
+			{
+				gameCount++;
+				responce += games[i].board;
+			}
+		}
+		responce[0] = gameCount + '0';
 	}
 	std::string serverMessage = "HTTP/1.1 200 OK\n Content-Type: text/html\nContent-Length: ";
 	serverMessage.append(std::to_string(responce.size()));

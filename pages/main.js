@@ -1,9 +1,25 @@
 let gameid = 0;
 
+let games = [];
+let gameCtx = [];
+
+function newGame() {
+  let canvas = document.createElement('canvas');
+  canvas.width = width * box;
+  canvas.height = height * box;
+  canvas.oncontextmenu = () => { return false; }
+  canvas.style = "border:1px solid #000000;";
+  games.push(canvas);
+  gameCtx.push(canvas.getContext('2d'));
+  let div = document.getElementById("external games");
+  div.appendChild(canvas);
+}
+
 $.get(
   "http://" + window.location.host + "/dothing/",
   null,
   function(data) {
+    gameid = data;
     console.log(data);
   }
 );
@@ -48,7 +64,7 @@ let peiceTabler3 = [
 
 let board = document.getElementById("board");
 let ctx = board.getContext("2d");
-let box = 32;
+let box = 30;
 let width = 10;
 let height = 20;
 let active = true;
@@ -59,10 +75,6 @@ let scoreDiv = document.getElementById("score");
 
 //random gen list
 let list = [0, 1, 2, 3, 4, 5, 6];
-
-//game2
-let g2Canvas = document.getElementById("game2");
-let g2ctx = g2Canvas.getContext("2d");
 
 //nextPeice
 let nextCanvas = document.getElementById("next");
@@ -89,9 +101,6 @@ let lineClear = false;
 board.width = box * width;
 board.height = box * height;
 
-g2Canvas.width = box * width;
-g2Canvas.height = box * height;
-
 nextCanvas.width = box * 4;
 nextCanvas.height = box * 4;
 
@@ -104,6 +113,14 @@ for (let x = 0; x < width; x++) {
   for (let y = 0; y < height; y++) {
     grid[x][y] = 7;
   }
+}
+function init() {
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+      grid[x][y] = 7;
+    }
+  }
+  score = 0;
 }
 
 addEventListener("load", (event) => {
@@ -160,20 +177,111 @@ function draw() {
   }
 
   document.getElementById("highScore").innerHTML = "high score: " + document.cookie;
+  let str = "";
+  let n = data.length;
+  for (let i = 0; i < n; i++) {
+
+    // Count occurrences of current character
+    let count = 1;
+    while (i < n - 1 && data[i] == data[i + 1]) {
+      count++;
+      i++;
+    }
+    // Print character and its count
+    switch (data[i]) {
+      case 0:
+        str += 'a';
+        break;
+      case 1:
+        str += 'b';
+        break;
+      case 2:
+        str += 'c';
+        break;
+      case 3:
+        str += 'd';
+        break;
+      case 4:
+        str += 'e';
+        break;
+      case 5:
+        str += 'f';
+        break;
+      case 6:
+        str += 'g';
+        break;
+      case 7:
+        str += 'h';
+        break;
+      case 8:
+        str += 'i';
+        break;
+    }
+    str += count;
+  }
 
   $.get(
-    "http://" + window.location.host + "/game/" + gameid + "%" + data.join(''),
+    "http://" + window.location.host + "/game/" + gameid + "%" + str,
     null,
     function(data) {
       console.log(data);
-      if (data == "-1") return;
-      g2ctx.clearRect(0, 0, board.width, board.height);
-      let i = 0;
-      for (let x = 0; x < 10; x++) {
-        for (let y = 0; y < 20; y++) {
-          g2ctx.fillStyle = colors[data[i]];
-          g2ctx.fillRect(x * box, y * box, box, box);
-          i++;
+      if (data[0] == '0') return;
+      let gameCount = parseInt(data[0]);
+      if (gameCount > games.length) {
+        newGame();
+      }
+      let i = 1;
+      for (let k = 0; k < gameCount; k++) {
+        let g2ctx = gameCtx[k];
+        g2ctx.clearRect(0, 0, board.width, board.height);
+        let char = 'f';
+        let count = 0;
+        for (let x = 0; x < 10; x++) {
+          for (let y = 0; y < 20; y++) {
+            if (count == 0) {
+              switch (data[i]) {
+                case 'a':
+                  char = 0;
+                  break;
+                case 'b':
+                  char = 1;
+                  break;
+                case 'c':
+                  char = 2;
+                  break;
+                case 'd':
+                  char = 3;
+                  break;
+                case 'e':
+                  char = 4;
+                  break;
+                case 'f':
+                  char = 5;
+                  break;
+                case 'g':
+                  char = 6;
+                  break;
+                case 'h':
+                  char = 7;
+                  break;
+                case 'i':
+                  char = 8;
+                  break;
+              }
+              i++;
+              let num = data[i];
+              while (!isNaN(data[i])) {
+                i++;
+                num += data[i];
+              }
+              count = parseInt(num);
+              console.log(char);
+              console.log(count);
+            }
+            g2ctx.fillStyle = colors[char];
+            g2ctx.fillRect(x * box, y * box, box, box);
+            count--;
+          }
         }
       }
     }
@@ -208,6 +316,9 @@ window.addEventListener("keydown", function(event) {
     if (!lineClear) {
       let didCollide = false;
       switch (event.key) {
+        case "l":
+          init();
+          break
         case "ArrowDown":
         case "s":
           for (let i = 0; i < 8; i += 2) {
@@ -347,7 +458,7 @@ function collide(lineBreak, yOffset) {
       }
       peicex = 4;
       peicey = 1;
-      peicerot = 0;
+      peiceRot = 0;
       peice = peiceTabler0[nextId];
       nextId = nextRand();
       next = peiceTabler0[nextId];

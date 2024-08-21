@@ -104,8 +104,7 @@ int main(int argc, const char** argv)
 		r.arg = arg;
 		r.path = path;
 		r.socket = newWsocket;
-		std::thread t(handleRequest, r);
-		t.detach();
+    handleRequest(r);
 	}
 	closesocket(wsocket);
 	return 0;
