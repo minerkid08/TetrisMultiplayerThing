@@ -1,18 +1,41 @@
 let gameid = 0;
 
+let gameBox = 30;
+
+let currentGameCount = 0;
+
 let games = [];
 let gameCtx = [];
 
 function newGame() {
-  let canvas = document.createElement('canvas');
-  canvas.width = width * box;
-  canvas.height = height * box;
-  canvas.oncontextmenu = () => { return false; }
-  canvas.style = "border:1px solid #000000;";
-  games.push(canvas);
-  gameCtx.push(canvas.getContext('2d'));
-  let div = document.getElementById("external games");
-  div.appendChild(canvas);
+  if (currentGameCount < games.length) {
+    games[currentGameCount].style = "border:1px solid #000000;";
+  }
+  else {
+    let canvas = document.createElement('canvas');
+    canvas.width = width * box;
+    canvas.height = height * box;
+    canvas.oncontextmenu = () => { return false; }
+    canvas.style = "border:1px solid #000000;";
+    games.push(canvas);
+    gameCtx.push(canvas.getContext('2d'));
+    let div = document.getElementById("external games");
+    div.appendChild(canvas);
+  }
+  currentGameCount++;
+}
+
+function updateGameSize() {
+  for (let i = 0; i < games.length; i++) {
+    games[i].width = gameBox * width;
+    games[i].height = gameBox * height;
+  }
+}
+
+function removeGame() {
+  console.log("removeGame");
+  games[currentGameCount - 1].style = "visibility:hidden";
+  currentGameCount--;
 }
 
 $.get(
@@ -123,6 +146,12 @@ function init() {
   score = 0;
 }
 
+addEventListener("beforeunload", function(e) {
+  $.get(
+    "http://" + window.location.host + "/close/" + gameid
+  )
+});
+
 addEventListener("load", (event) => {
   if (document.cookie == "") {
     document.cookie = 0;
@@ -224,12 +253,26 @@ function draw() {
     "http://" + window.location.host + "/game/" + gameid + "%" + str,
     null,
     function(data) {
-      console.log(data);
-      if (data[0] == '0') return;
       let gameCount = parseInt(data[0]);
-      if (gameCount > games.length) {
-        newGame();
+      if (gameCount > currentGameCount) {
+        while (gameCount > currentGameCount) {
+          newGame();
+        }
+        if (gameCount > 2) {
+          gameBox = 16;
+          updateGameSize();
+        }
       }
+      if (gameCount < currentGameCount) {
+        while (gameCount < currentGameCount) {
+          removeGame();
+        }
+        if (gameCount <= 2) {
+          gameBox = 20;
+          updateGameSize();
+        }
+      }
+      if (data[0] == '0') return;
       let i = 1;
       for (let k = 0; k < gameCount; k++) {
         let g2ctx = gameCtx[k];
@@ -275,11 +318,9 @@ function draw() {
                 num += data[i];
               }
               count = parseInt(num);
-              console.log(char);
-              console.log(count);
             }
             g2ctx.fillStyle = colors[char];
-            g2ctx.fillRect(x * box, y * box, box, box);
+            g2ctx.fillRect(x * gameBox, y * gameBox, gameBox, gameBox);
             count--;
           }
         }

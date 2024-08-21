@@ -22,8 +22,28 @@ void handleRequest(Request request)
 	}
 	else if (path[1] == 'd')
 	{
-		responce = std::to_string(gameIndex++);
-		games.push_back({});
+		bool bk = false;
+		for (int i = 0; i < games.size(); i++)
+		{
+			if (games[i].active == false)
+			{
+				responce = std::to_string(i);
+				games[i].active = true;
+				bk = true;
+				break;
+			}
+		}
+		if (!bk)
+		{
+			responce = std::to_string(gameIndex++);
+			games.push_back({});
+		}
+		std::cout << "new game " << responce << '\n';
+	}
+	else if (path[1] == 'c')
+	{
+		games[std::stoi(request.arg)].active = false;
+		std::cout << "close game " << request.arg << '\n';
 	}
 	else if (path[1] == 'g')
 	{
@@ -34,7 +54,7 @@ void handleRequest(Request request)
 		int gameCount = 0;
 		for (int i = 0; i < games.size(); i++)
 		{
-			if (i != gameInd)
+			if (i != gameInd && games[i].active)
 			{
 				gameCount++;
 				responce += games[i].board;
