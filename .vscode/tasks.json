@@ -1,0 +1,31 @@
+{
+    "tasks": [
+        {
+            "args": [
+                "2",
+                "main\\src",
+                "include",
+                "-o",
+                "${workspaceFolder}\\bin\\main.exe",
+                "-I${workspaceFolder}\\include",
+                "-I${workspaceFolder}\\main\\src",
+                "-lwsock32",
+                "-L${workspaceFolder}\\bin\\",
+                "-lglfw3"
+            ],
+            "command": "D:/cppGames/Build.exe",
+            "group": {
+                "kind": "build"
+            },
+            "label": "main",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "type": "cppbuild"
+        }
+    ],
+    "version": "2.0.0"
+}

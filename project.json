@@ -1,0 +1,14 @@
+{
+	"projects": [
+		{
+			"name": "main",
+			"build": ["include"],
+			"include": ["include"],
+			"type": "exe",
+			"out": "main.exe",
+			"dll": ["glfw3"],
+			"sdll": ["wsock32"],
+			"configs": ["build", "run"]
+		}
+	]
+}
