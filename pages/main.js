@@ -144,6 +144,7 @@ function init() {
     }
   }
   score = 0;
+  held = 0;
 }
 
 addEventListener("beforeunload", function(e) {
@@ -250,7 +251,7 @@ function draw() {
   }
 
   $.get(
-    "http://" + window.location.host + "/game/" + gameid + "%" + str,
+    "http://" + window.location.host + "/game/" + gameid + "%" + score + 'z' + str,
     null,
     function(data) {
       let gameCount = parseInt(data[0]);
@@ -275,6 +276,14 @@ function draw() {
       if (data[0] == '0') return;
       let i = 1;
       for (let k = 0; k < gameCount; k++) {
+        let gameid = data[i];
+        i++;
+        let gameScore = "";
+        while (!isNaN(data[i])) {
+          gameScore += data[i];
+          i++;
+        }
+        i++;
         let g2ctx = gameCtx[k];
         g2ctx.clearRect(0, 0, board.width, board.height);
         let char = 'f';
@@ -323,7 +332,12 @@ function draw() {
             g2ctx.fillRect(x * gameBox, y * gameBox, gameBox, gameBox);
             count--;
           }
-        }
+        } 
+        g2ctx.fillStyle = "#000000";
+        g2ctx.font = "bold 16px Arial";
+        g2ctx.textAlign = 'left';
+        g2ctx.textBaseline = 'top';
+        g2ctx.fillText("game: " + gameid + "\nscore: " + gameScore, 10, 10);
       }
     }
   );
