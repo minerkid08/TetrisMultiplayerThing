@@ -57,6 +57,7 @@ void handleRequest(Request request)
 			if (i != gameInd && games[i].active)
 			{
 				gameCount++;
+				responce += (i + '0');
 				responce += games[i].board;
 			}
 		}
