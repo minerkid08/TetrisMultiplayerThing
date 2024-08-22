@@ -43,6 +43,7 @@ $.get(
   null,
   function(data) {
     gameid = data;
+    document.getElementById("gameid").innerHTML = "game: " + gameid;
     console.log(data);
   }
 );
@@ -277,6 +278,10 @@ function draw() {
       let i = 1;
       for (let k = 0; k < gameCount; k++) {
         let gameid = data[i];
+        if (gameid == 'm') {
+          i++;
+          gameid = data[i];
+        }
         i++;
         let gameScore = "";
         while (!isNaN(data[i])) {
@@ -332,12 +337,13 @@ function draw() {
             g2ctx.fillRect(x * gameBox, y * gameBox, gameBox, gameBox);
             count--;
           }
-        } 
+        }
         g2ctx.fillStyle = "#000000";
         g2ctx.font = "bold 16px Arial";
         g2ctx.textAlign = 'left';
         g2ctx.textBaseline = 'top';
         g2ctx.fillText("game: " + gameid + "\nscore: " + gameScore, 10, 10);
+        i++;
       }
     }
   );
