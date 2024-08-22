@@ -44,6 +44,7 @@ void handleRequest(Request request)
 	{
 		games[std::stoi(request.arg)].active = false;
 		std::cout << "close game " << request.arg << '\n';
+		responce = "1";
 	}
 	else if (path[1] == 'g')
 	{
@@ -57,6 +58,8 @@ void handleRequest(Request request)
 			if (i != gameInd && games[i].active)
 			{
 				gameCount++;
+				if (gameCount > 0)
+					responce += 'm';
 				responce += (i + '0');
 				responce += games[i].board;
 			}
