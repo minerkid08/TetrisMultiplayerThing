@@ -158,6 +158,10 @@ addEventListener("load", (event) => {
   if (document.cookie == "") {
     document.cookie = 0;
   }
+  if(isNan(parseInt(document.cookie)))
+  {
+    document.cookie = 0;
+  }
 });
 
 //draw things
